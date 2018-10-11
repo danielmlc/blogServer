@@ -1,0 +1,13 @@
+{
+    "type": "mssql",
+    "host": "127.0.0.1",
+    "port": 1433,  
+    "username": "sa",
+    "password": "sa",
+    "database": "test",
+    "synchronize": true,
+    "logging": true,
+    "entities": [
+        "src/**/**.entity{.ts,.js}"
+    ]
+ }

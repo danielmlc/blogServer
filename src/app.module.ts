@@ -13,7 +13,7 @@ import { AppService } from './app.service';
   providers: [
     {
       provide: APP_INTERCEPTOR,
-      useClass: ErrorsInterceptor
+      useClass: ErrorsInterceptor,
     },
     AppService],
 })

@@ -21,8 +21,13 @@
   },
   "dependencies": {
     "@nestjs/common": "^5.1.0",
-    "@nestjs/core": "^5.1.0", 
+    "@nestjs/core": "^5.1.0",
+    "@nestjs/microservices": "^5.3.0",
+    "@nestjs/swagger": "^2.4.4",
+    "@nestjs/testing": "^5.3.0",
+    "@nestjs/websockets": "^5.3.0",
     "@nestjs/typeorm": "^5.2.0",
+    "mssql": "^4.2.1",
     "reflect-metadata": "^0.1.12",
     "rxjs": "^6.2.2",
     "typeorm": "^0.1.16",
@@ -49,7 +54,11 @@
     "webpack-node-externals": "^1.7.2"
   },
   "jest": {
-    "moduleFileExtensions": ["js", "json", "ts"],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "ts"
+    ],
     "rootDir": "src",
     "testRegex": ".spec.ts$",
     "transform": {
