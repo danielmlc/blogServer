@@ -18,12 +18,6 @@ export class CatController {
     ) { }
 
     @Post()
-    @ApiOperation({ title: '添加' })
-    @ApiResponse({
-      status: 201,
-      description: 'The record has been successfully created.',
-    })
-    @ApiResponse({ status: 403, description: 'Forbidden.' })
     async createCat(@Body() cat: Cat): Promise<Result> {
         await this.catService.createCat(cat);
         return { code: 200, message: '创建成功' };
@@ -42,12 +36,6 @@ export class CatController {
     }
 
     @Put(':id')
-    @ApiOperation({ title: 'Create cat' })
-    @ApiResponse({
-      status: 201,
-      description: 'The record has been successfully created.',
-    })
-    @ApiResponse({ status: 403, description: 'Forbidden.' })
     async updateCat(@Param('id') id: number, @Body() cat: Cat): Promise<Result> {
         await this.catService.updateCat(id, cat);
         return { code: 200, message: '更新成功' };
