@@ -9,12 +9,12 @@ export class ErrorsInterceptor implements NestInterceptor {
             if (error instanceof HttpException) {
                 return Promise.resolve({
                     code: error.getStatus(),
-                    message: error.getResponse()
+                    message: error.getResponse(),
                 });
             }
             return Promise.resolve({
                 code: 500,
-                message: `出现了意外错误：${error.toString()}`
+                message: `出现了意外错误：${error.toString()}`,
             });
         }));
     }

@@ -38,7 +38,7 @@ export class CatService {
      */
     async deleteCat(id: number): Promise<void> {
         await this.findOneById(id);
-        this.catRepo.delete(id);
+        this.catRepo.deleteById(id);
     }
 
     /**
@@ -51,7 +51,7 @@ export class CatService {
         await this.findOneById(id);
         // 更新数据时，删除 id，以避免请求体内传入 id
         delete cat.id;
-        this.catRepo.update(id, cat);
+        this.catRepo.updateById(id, cat);
     }
 
     /**
@@ -68,7 +68,7 @@ export class CatService {
      * @param id ID
      */
     private async findOneById(id: number): Promise<Cat> {
-        const catInfo = await this.catRepo.findOne(id);
+        const catInfo = await this.catRepo.findOneById(id);
         if (!catInfo) {
             throw new HttpException(`指定 id=${id} 的猫猫不存在`, 404);
         }
