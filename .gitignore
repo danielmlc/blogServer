@@ -5,6 +5,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+#config files
+ormconfig.json
+src/config.ts
+
 # Editor directories and files
 .idea
 *.suo
