@@ -1,46 +1,52 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, ManyToOne, OneToMany, JoinColumn, AfterUpdate, BeforeUpdate } from 'typeorm';
-import { UserEntity } from '../user/user.entity';
-import { Comment } from './comment.entity';
+import { Column, Entity, PrimaryColumn} from 'typeorm';
+import { AllExtensionColumn} from "../common/entity";
 
-@Entity('article')
-export class ArticleEntity {
-
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column()
-  slug: string;
-
-  @Column()
-  title: string;
-
-  @Column({default: ''})
-  description: string;
-
-  @Column({default: ''})
-  body: string;
-
-  @Column({ type: 'timestamp', default: () => "CURRENT_TIMESTAMP"})
-  created: Date;
-
-  @Column({ type: 'timestamp', default: () => "CURRENT_TIMESTAMP"})
-  updated: Date;
-
-  @BeforeUpdate()
-  updateTimestamp() {
-    this.updated = new Date;
-  }
-
-  @Column('simple-array')
-  tagList: string[];
-
-  @ManyToOne(type => UserEntity, user => user.articles)
-  author: UserEntity;
-
-  @OneToMany(type => Comment, comment => comment.article, {eager: true})
-  @JoinColumn()
-  comments: Comment[];
-
-  @Column({default: 0})
-  favoriteCount: number;
+@Entity('Article')
+export class Article extends AllExtensionColumn{
+      @PrimaryColumn({
+        //  comment: '主键',
+        type: "nvarchar",
+        length: 50,
+      })
+      Id: string;
+      @Column({
+         // comment: '标题',
+         type: "nvarchar",
+         length: 200,
+      })
+      Title: string;
+      @Column({
+        // comment: '副标题',
+        type: "nvarchar",
+        length: 500,
+        nullable: true,
+     })
+     Subtitle: string;
+     @Column({
+        // comment: '内容',
+        type: "nvarchar",
+        length: 4000,
+        nullable: true,
+     })
+     Content: string;
+     @Column({
+        // comment: '配图',
+        type: "nvarchar",
+        length: 200,
+        nullable: true,
+     })
+     Imgurl: string;
+     @Column({
+            // comment: '标签',
+            type: "nvarchar",
+            length: 200,
+            nullable: true,
+        })
+     Tags: string;
+     @Column({
+            // comment: '浏览次数',
+            type: "int",
+            nullable: true,
+    })
+    ScanNum: number;
 }

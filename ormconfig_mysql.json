@@ -1,10 +1,10 @@
 {
-    "type": "mssql",
-    "host": "localhost",
-    "port": 1433,  
+    "type": "mysql",
+    "host": "192.168.20.241",
+    "port": 3306,  
     "username": "sa",
-    "password": "sa",
-    "database": "BLOG_CMS",
+    "password": "ddd88227793",
+    "database": "test",
     "synchronize": true,
     "logging": true,
     "entities": [

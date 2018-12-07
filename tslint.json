@@ -9,7 +9,7 @@
     "rules": {
         "eofline": false,
         "quotemark": [
-            true,
+            false,
             "single"
         ],
         "indent": false,

@@ -1,204 +1,78 @@
-import { Component, Inject } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, getRepository } from 'typeorm';
-import { ArticleEntity } from './article.entity';
-import { Comment } from './comment.entity';
-import { UserEntity } from '../user/user.entity';
-import { FollowsEntity } from '../profile/follows.entity';
-import { CreateArticleDto } from './dto';
+import { Repository } from 'typeorm';
+import { Article } from './article.entity';
 
-import {ArticleRO, ArticlesRO, CommentsRO} from './article.interface';
-const slug = require('slug');
+@Injectable()
+export class CatService {
+    constructor(
+        @InjectRepository(Article) private readonly catRepo: Repository<Article>,
+        // 使用泛型注入对应类型的存储库实例
+    ) { }
 
-@Component()
-export class ArticleService {
-  constructor(
-    @InjectRepository(ArticleEntity)
-    private readonly articleRepository: Repository<ArticleEntity>,
-    @InjectRepository(Comment)
-    private readonly commentRepository: Repository<Comment>,
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
-    @InjectRepository(FollowsEntity)
-    private readonly followsRepository: Repository<FollowsEntity>
-  ) {}
+    /**
+     * 创建
+     *
+     * @param cat Cat 实体对象
+     */
+    async createArticle(cat: Article): Promise<Article> {
+        /**
+         * 创建新的实体实例，并将此对象的所有实体属性复制到新实体中。 请注意，它仅复制实体模型中存在的属性。
+         */
+        // this.catRepo.create(cat);
 
-  async findAll(query): Promise<ArticlesRO> {
+        // 插入数据时，删除 id，以避免请求体内传入 id
+        delete cat.id;
+        return this.catRepo.save(cat);
 
-    const qb = await getRepository(ArticleEntity)
-      .createQueryBuilder('article')
-      .leftJoinAndSelect('article.author', 'author');
-
-    qb.where("1 = 1");
-
-    if ('tag' in query) {
-      qb.andWhere("article.tagList LIKE :tag", { tag: `%${query.tag}%` });
+        /**
+         * 将给定实体插入数据库。与save方法不同，执行原始操作时不包括级联，关系和其他操作。
+         * 执行快速有效的INSERT操作。不检查数据库中是否存在实体，因此如果插入重复实体，本次操作将失败。
+         */
+        // await this.catRepo.insert(cat);
     }
 
-    if ('author' in query) {
-      const author = await this.userRepository.findOne({username: query.author});
-      qb.andWhere("article.authorId = :id", { id: author.id });
+    /**
+     * 删除
+     *
+     * @param id ID
+     */
+    async deleteCat(id: number): Promise<void> {
+        await this.findOneById(id);
+        this.catRepo.deleteById(id);
     }
 
-    if ('favorited' in query) {
-      const author = await this.userRepository.findOne({username: query.favorited});
-      const ids = author.favorites.map(el => el.id);
-      qb.andWhere("article.authorId IN (:ids)", { ids });
+    /**
+     * 更新
+     *
+     * @param id ID
+     * @param cat Cat 实体对象
+     */
+    async updateCat(id: number, cat: Cat): Promise<void> {
+        await this.findOneById(id);
+        // 更新数据时，删除 id，以避免请求体内传入 id
+        delete cat.id;
+        this.catRepo.updateById(id, cat);
     }
 
-    qb.orderBy('article.created', 'DESC');
-
-    const articlesCount = await qb.getCount();
-
-    if ('limit' in query) {
-      qb.limit(query.limit);
+    /**
+     * 根据ID查询
+     *
+     * @param id ID
+     */
+    async findOneCat(id: number): Promise<Cat> {
+        return this.findOneById(id);
     }
 
-    if ('offset' in query) {
-      qb.offset(query.offset);
+    /**
+     * 根据ID查询单个信息，如果不存在则抛出404异常
+     * @param id ID
+     */
+    private async findOneById(id: number): Promise<Cat> {
+        const catInfo = await this.catRepo.findOneById(id);
+        if (!catInfo) {
+            throw new HttpException(`指定 id=${id} 的猫猫不存在`, 404);
+        }
+        return catInfo;
     }
-
-    const articles = await qb.getMany();
-
-    return {articles, articlesCount};
-  }
-
-  async findFeed(userId: number, query): Promise<ArticlesRO> {
-    const _follows = await this.followsRepository.find( {followerId: userId});
-    const ids = _follows.map(el => el.followingId);
-
-    const qb = await getRepository(ArticleEntity)
-      .createQueryBuilder('article')
-      .where('article.authorId IN (:ids)', { ids });
-
-    qb.orderBy('article.created', 'DESC');
-
-    const articlesCount = await qb.getCount();
-
-    if ('limit' in query) {
-      qb.limit(query.limit);
-    }
-
-    if ('offset' in query) {
-      qb.offset(query.offset);
-    }
-    
-    const articles = await qb.getMany();
-
-    return {articles, articlesCount};
-  }
-
-  async findOne(where): Promise<ArticleRO> {
-    const article = await this.articleRepository.findOne(where);
-    return {article};
-  }
-
-  async addComment(slug: string, commentData): Promise<ArticleRO> {
-    let article = await this.articleRepository.findOne({slug});
-
-    const comment = new Comment();
-    comment.body = commentData.body;
-
-    article.comments.push(comment);
-
-    await this.commentRepository.save(comment);
-    article = await this.articleRepository.save(article);
-    return {article}
-  }
-
-  async deleteComment(slug: string, id: string): Promise<ArticleRO> {
-    let article = await this.articleRepository.findOne({slug});
-
-    const comment = await this.commentRepository.findOneById(id);
-    const deleteIndex = article.comments.findIndex(_comment => _comment.id === comment.id);
-
-    if (deleteIndex >= 0) {
-      const deleteComments = article.comments.splice(deleteIndex, 1);
-      await this.commentRepository.deleteById(deleteComments[0].id);
-      article =  await this.articleRepository.save(article);
-      return {article};
-    } else {
-      return {article};
-    }
-
-  }
-
-  async favorite(id: number, slug: string): Promise<ArticleRO> {
-    let article = await this.articleRepository.findOne({slug});
-    const user = await this.userRepository.findOneById(id);
-
-    const isNewFavorite = user.favorites.findIndex(_article => _article.id === article.id) < 0;
-    if (isNewFavorite) {
-      user.favorites.push(article);
-      article.favoriteCount++;
-
-      await this.userRepository.save(user);
-      article = await this.articleRepository.save(article);
-    }
-
-    return {article};
-  }
-
-  async unFavorite(id: number, slug: string): Promise<ArticleRO> {
-    let article = await this.articleRepository.findOne({slug});
-    const user = await this.userRepository.findOneById(id);
-
-    const deleteIndex = user.favorites.findIndex(_article => _article.id === article.id);
-
-    if (deleteIndex >= 0) {
-
-      user.favorites.splice(deleteIndex, 1);
-      article.favoriteCount--;
-
-      await this.userRepository.save(user);
-      article = await this.articleRepository.save(article);
-    }
-
-    return {article};
-  }
-
-  async findComments(slug: string): Promise<CommentsRO> {
-    const article = await this.articleRepository.findOne({slug});
-    return {comments: article.comments};
-  }
-
-  async create(userId: number, articleData: CreateArticleDto): Promise<ArticleEntity> {
-
-    let article = new ArticleEntity();
-    article.title = articleData.title;
-    article.description = articleData.description;
-    article.slug = this.slugify(articleData.title);
-    article.tagList = articleData.tagList || [];
-    article.comments = [];
-
-    const newArticle = await this.articleRepository.save(article);
-
-    const author = await this.userRepository.findOneById(userId);
-
-    if (Array.isArray(author.articles)) {
-      author.articles.push(article);
-    } else {
-      author.articles = [article];
-    }
-
-    await this.userRepository.save(author);
-
-    return newArticle;
-
-  }
-
-  async update(slug: string, articleData: any): Promise<ArticleRO> {
-    let toUpdate = await this.articleRepository.findOne({ slug: slug});
-    let updated = Object.assign(toUpdate, articleData);
-    const article = await this.articleRepository.save(updated);
-    return {article};
-  }
-
-  async delete(slug: string): Promise<void> {
-    return await this.articleRepository.delete({ slug: slug});
-  }
-
-  slugify(title: string) {
-    return slug(title, {lower: true}) + '-' + (Math.random() * Math.pow(36, 6) | 0).toString(36)
-  }
 }

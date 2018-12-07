@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-
 @Injectable()
 export class AppService {
   root(): string {
@@ -13,7 +12,7 @@ export class AppService {
     </head>
     <body style="background:#ddd">
         <p>blog api service is OK...</p>
-        <p>api document: http://***/docs</p>
+        <p>api document: http://ip+port/docs</p>
     </body>
     </html>`;
   }

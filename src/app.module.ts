@@ -7,13 +7,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { CatModule } from 'cat/cat.module';
-import { AuthModule } from 'auth/auth.module';
-
+import { ArticleModule } from 'article/article.module';
 @Module({
   imports: [
-    TypeOrmModule.forRoot(), 
+    TypeOrmModule.forRoot(),
     CatModule,
-    AuthModule
+    ArticleModule,
   ],
   controllers: [AppController],
   providers: [
@@ -21,7 +20,7 @@ import { AuthModule } from 'auth/auth.module';
       provide: APP_INTERCEPTOR,
       useClass: ErrorsInterceptor,
     },
-    AppService
+    AppService,
   ],
 })
 
