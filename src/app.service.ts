@@ -10,9 +10,9 @@ export class AppService {
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>Document</title>
     </head>
-    <body style="background:#ddd">
-        <p>blog api service is OK...</p>
-        <p>api document: http://ip+port/docs</p>
+    <body style="background:#BF532A">
+        <p>博客后台服务已启动...</p>
+        <p>文档地址: http://ip+port/docs</p>
     </body>
     </html>`;
   }

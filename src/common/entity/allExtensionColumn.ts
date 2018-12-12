@@ -7,11 +7,11 @@ export abstract  class AllExtensionColumn extends  AuditedColumn {
          type: "int",
          nullable: true,
       })
-   sortCode: number;
+   SortCode: number;
    @Column({
      // comment: '状态',
         type: "bit",
         nullable: true,
      })
-   isActive: boolean;
+   IsActive: boolean;
 }

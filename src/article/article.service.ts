@@ -1,78 +1,103 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, getRepository } from 'typeorm';
 import { Article } from './article.entity';
+import { ArticleDto, ArticleObjectDto, ArticleListDto } from './dto';
+import { QueryConditionInput } from '../common/dto';
 
 @Injectable()
-export class CatService {
+export class ArticleService {
     constructor(
-        @InjectRepository(Article) private readonly catRepo: Repository<Article>,
-        // 使用泛型注入对应类型的存储库实例
+        @InjectRepository(Article) private readonly articleRepo: Repository<Article>,
     ) { }
-
     /**
-     * 创建
      *
-     * @param cat Cat 实体对象
-     */
-    async createArticle(cat: Article): Promise<Article> {
-        /**
-         * 创建新的实体实例，并将此对象的所有实体属性复制到新实体中。 请注意，它仅复制实体模型中存在的属性。
-         */
-        // this.catRepo.create(cat);
-
-        // 插入数据时，删除 id，以避免请求体内传入 id
-        delete cat.id;
-        return this.catRepo.save(cat);
-
-        /**
-         * 将给定实体插入数据库。与save方法不同，执行原始操作时不包括级联，关系和其他操作。
-         * 执行快速有效的INSERT操作。不检查数据库中是否存在实体，因此如果插入重复实体，本次操作将失败。
-         */
-        // await this.catRepo.insert(cat);
-    }
-
-    /**
-     * 删除
      *
-     * @param id ID
+     * @param {QueryConditionInput} queryConditionInput
+     * @returns {Promise<Article[]>}
+     * @memberof ArticleService
      */
-    async deleteCat(id: number): Promise<void> {
-        await this.findOneById(id);
-        this.catRepo.deleteById(id);
+    async queryDataList(queryConditionInput: QueryConditionInput): Promise<ArticleListDto> {
+        const List = await getRepository<Article>(Article)
+            .createQueryBuilder(queryConditionInput.TableName)
+            .where(queryConditionInput.ConditionLambda, queryConditionInput.ConditionValue)
+            .orderBy(queryConditionInput.OrderBy)
+            .skip(queryConditionInput.Skip)
+            .take(queryConditionInput.Take)
+            .getMany();
+        const result: ArticleListDto = { Items: List };
+        return result;
     }
-
+    async queryObject(queryConditionInput: QueryConditionInput): Promise<ArticleObjectDto> {
+        const Object = await getRepository<Article>(Article)
+            .createQueryBuilder(queryConditionInput.TableName)
+            .where(queryConditionInput.ConditionLambda, queryConditionInput.ConditionValue)
+            .orderBy(queryConditionInput.OrderBy)
+            .getOne();
+        const result: ArticleObjectDto = { Order: Object };
+        return result;
+    }
     /**
-     * 更新
      *
-     * @param id ID
-     * @param cat Cat 实体对象
-     */
-    async updateCat(id: number, cat: Cat): Promise<void> {
-        await this.findOneById(id);
-        // 更新数据时，删除 id，以避免请求体内传入 id
-        delete cat.id;
-        this.catRepo.updateById(id, cat);
-    }
-
-    /**
-     * 根据ID查询
      *
-     * @param id ID
+     * @param {ArticleDto} articleDto
+     * @returns {Promise<void>}
+     * @memberof ArticleService
      */
-    async findOneCat(id: number): Promise<Cat> {
-        return this.findOneById(id);
+    async createObject(articleDto: ArticleDto): Promise<void> {
+        const uuidv4 = require('uuid/v4');
+        articleDto.Id = uuidv4();
+        return await this.articleRepo.insert(articleDto);
     }
-
     /**
-     * 根据ID查询单个信息，如果不存在则抛出404异常
-     * @param id ID
+     *
+     *
+     * @param {ArticleDto} articleDto
+     * @returns {Promise<void>}
+     * @memberof ArticleService
      */
-    private async findOneById(id: number): Promise<Cat> {
-        const catInfo = await this.catRepo.findOneById(id);
-        if (!catInfo) {
-            throw new HttpException(`指定 id=${id} 的猫猫不存在`, 404);
+    async updateById(articleDto: ArticleDto): Promise<void> {
+        return await this.articleRepo.update({ Id: articleDto.Id }, articleDto);
+    }
+    /**
+     *
+     *
+     * @param {ArticleObjectDto} articleObjectDto
+     * @returns {Promise<void>}
+     * @memberof ArticleService
+     */
+    async createOrUpdateObject(articleObjectDto: ArticleObjectDto): Promise<void> {
+        if (articleObjectDto.Order.Id) {
+            return await this.updateById(articleObjectDto.Order);
+        } else {
+            return await this.createObject(articleObjectDto.Order);
         }
-        return catInfo;
     }
+    /**
+     *
+     *
+     * @param {ArticleListDto} articleListDto
+     * @returns {Promise<void>}
+     * @memberof ArticleService
+     */
+    async createOrUpdateList(articleListDto: ArticleListDto): Promise<void> {
+        articleListDto.Items.forEach( async (i) => {
+            if (i.Id) {
+                return await this.updateById(i);
+            } else {
+                return await this.createObject(i);
+            }
+        });
+    }
+    /**
+     *
+     *
+     * @param {ArticleDto} articleDto
+     * @returns {Promise<void>}
+     * @memberof ArticleService
+     */
+    async deleteObject(articleDto: ArticleDto): Promise<void> {
+        return await this.articleRepo.delete(articleDto);
+    }
+
 }
