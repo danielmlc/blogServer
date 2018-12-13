@@ -3,17 +3,17 @@ import { ApiModelProperty } from '@nestjs/swagger';
 
 export class  QueryConditionInput {
     @ApiModelProperty()
-    selectRow: Array<string>;
+    selectRow?: Array<string>;
     @ApiModelProperty()
-    ConditionLambda: string;
+    ConditionLambda?: string;
     @ApiModelProperty()
-    ConditionValue: object;
+    ConditionValue?: object;
     @ApiModelProperty()
-    OrderBy: string;
+    OrderBy?: string;
     @ApiModelProperty()
-    TableName: string;
+    TableName?: string;
     @ApiModelProperty()
-    Skip: number;
+    Skip?: number;
     @ApiModelProperty()
-    Take: number;
+    Take?: number;
 }

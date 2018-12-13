@@ -6,7 +6,8 @@ import {
     ApiResponse,
     ApiUseTags,
 } from '@nestjs/swagger';
-
+import { RolesGuard } from '../auth/guards/roles.guards';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { ArticleService } from './article.service';
 import { ArticleDto, ArticleObjectDto, ArticleListDto } from './dto';
 import { QueryConditionInput } from '../common/dto';
@@ -24,35 +25,38 @@ export class ArticleController {
     @ApiOperation({title: '根据条件查询数据（可分页）|返回数据集' })
     @ApiResponse({ status: 401, description: 'Forbidden.' })
     async queryDataList(@Body() queryConditionInput: QueryConditionInput): Promise<Result<ArticleListDto>> {
-        const list = await this.articleService.queryDataList(queryConditionInput);
-        const result: Result<ArticleListDto> = { code: 200, success: true, message: '成功！', result: list };
-        return result;
+        const _result = await this.articleService.queryDataList(queryConditionInput);
+        return { code: 200, success: true, message: '成功！', result: _result };
     }
     @Post('/queryObject')
     @ApiOperation({ title: '根据条件查询数据符合条件的对象' })
-    async queryObject(@Body() queryConditionInput: QueryConditionInput): Promise<ArticleObjectDto> {
-        return await this.articleService.queryObject(queryConditionInput);
+    async queryObject(@Body() queryConditionInput: QueryConditionInput): Promise<Result<ArticleObjectDto>> {
+        const _result =  await this.articleService.queryObject(queryConditionInput);
+        return { code: 200, success: true, message: '成功！', result: _result };
     }
     @Post('/createOrUpdateObject')
     @ApiOperation({ title: '添加或更新单个对象' })
     @ApiResponse({ status: 401, description: 'Forbidden.' })
-    async createOrUpdateObject(@Body() articleObjectDto: ArticleObjectDto): Promise<void> {
-        return await this.articleService.createOrUpdateObject(articleObjectDto);
+    @Roles('admin')
+    @UseGuards(AuthGuard(), RolesGuard)
+    async createOrUpdateObject(@Body() articleObjectDto: ArticleObjectDto): Promise<Result<any>> {
+        const _result =  await this.articleService.createOrUpdateObject(articleObjectDto);
+        return { code: 200, success: true, message: '成功！', result: null };
     }
 
     @Post('/createOrUpdateList')
     @ApiOperation({ title: '添加或更新多个对象' })
     @ApiResponse({ status: 401, description: 'Forbidden.' })
-    @UseGuards(AuthGuard())
-    async createOrUpdateList(@Body() articleListDto: ArticleListDto): Promise<void> {
-        return await this.articleService.createOrUpdateList(articleListDto);
+    async createOrUpdateList(@Body() articleListDto: ArticleListDto): Promise<Result<any>> {
+        const _result =  await this.articleService.createOrUpdateList(articleListDto);
+        return { code: 200, success: true, message: '成功！', result: null };
     }
 
     @Delete('/deleteObject')
     @ApiOperation({ title: '删除指定对象' })
     @ApiResponse({ status: 401, description: 'Forbidden.' })
-    @UseGuards(AuthGuard())
-    async deleteObject(@Body() articleDto: ArticleDto): Promise<void> {
-        return await this.articleService.deleteObject(articleDto);
+    async deleteObject(@Body() articleDto: ArticleDto): Promise<Result<any>> {
+        const _result =  await this.articleService.deleteObject(articleDto);
+        return { code: 200, success: true, message: '成功！', result: null };
     }
 }

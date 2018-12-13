@@ -1,6 +1,6 @@
 import {IsNotEmpty } from 'class-validator';
-import {ExtensionColumn } from 'common/dto';
-export class  ArticleDto extends ExtensionColumn{
+import {ExtensionDto } from 'common/dto';
+export class  ArticleDto extends ExtensionDto{
         Id: string;
         @IsNotEmpty()
         Title?: string;

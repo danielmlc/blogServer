@@ -5,7 +5,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const options = new DocumentBuilder()
-  .setTitle('blogService Api Document')
+  .setTitle('BlogService Api Document')
   .setDescription('博客API服务文档')
   .setVersion('1.0')
   .addTag('blog nest typeorm')

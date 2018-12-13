@@ -5,6 +5,7 @@ export abstract  class FullAuditedColumn extends  AuditedColumn {
    @Column({
         // comment: '删除标识',
            type: "bit",
+           nullable: true,
         })
         IsDeleted: boolean;
    @Column({
