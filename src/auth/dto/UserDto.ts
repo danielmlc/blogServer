@@ -1,5 +1,5 @@
 import {IsNotEmpty } from 'class-validator';
-import {FullAuditedDto } from 'common/dto';
+import {FullAuditedDto } from '../../common/dto';
 export class  UserDto extends FullAuditedDto{
         Id: string;
         @IsNotEmpty()

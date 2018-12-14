@@ -15,16 +15,16 @@ import { CryptoUtil } from '../common/utils/crypto.util';
     JwtModule.register({
         secretOrPrivateKey: 'secretKey',
         signOptions: {
-            expiresIn: 3600
-        }
-    })
+            expiresIn: 3600,
+        },
+    }),
     ],
     controllers: [UserController],
     providers: [
         CryptoUtil,
         AuthService,
         AuthStrategy,
-        UserService
+        UserService,
     ],
 })
 export class AuthModule {}

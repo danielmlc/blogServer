@@ -15,6 +15,7 @@ export class AuthService {
     }
 
     async ValidateUser(payload: { Account: string }): Promise<any> {
+        console.log('init',payload);
         const queryConditionInput: QueryConditionInput = {
             ConditionLambda: "User.Account=:Account and User.IsActive=:IsActive",
             ConditionValue: { Account: payload.Account, IsActive: true },

@@ -23,6 +23,7 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
      * 当用户存在时，会将 user 对象添加到 req 中，在之后的 req 对象中，可以使用 req.user 获取当前登录用户。
      */
     async validate(payload: { Account: string }) {
+        console.log('验证',payload);
         const user = await this.authService.ValidateUser(payload);
         if (!user) {
             throw new UnauthorizedException();

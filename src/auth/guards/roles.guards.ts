@@ -17,10 +17,10 @@ export class RolesGuard implements CanActivate {
         }
         // 在请求对象中获取 user 对象，此 user 对象是 AuthStrategy 中 validate 方法成功执行后的返回值
         const request = context.switchToHttp().getRequest();
-        const user: User = request.user;
-
+        const user: User = request.user.Order;
         // 判断是否为管理员
-        const hasRole = () => user.Role === 'admin';
+        console.log(roles)
+        const hasRole = () => roles.includes(user.Role);
         return user && hasRole();
     }
 

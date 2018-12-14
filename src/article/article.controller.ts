@@ -34,16 +34,17 @@ export class ArticleController {
         const _result =  await this.articleService.queryObject(queryConditionInput);
         return { code: 200, success: true, message: '成功！', result: _result };
     }
+    @Roles('admin', 'user')
+    @UseGuards(AuthGuard(), RolesGuard)
     @Post('/createOrUpdateObject')
     @ApiOperation({ title: '添加或更新单个对象' })
     @ApiResponse({ status: 401, description: 'Forbidden.' })
-    @Roles('admin')
-    @UseGuards(AuthGuard(), RolesGuard)
     async createOrUpdateObject(@Body() articleObjectDto: ArticleObjectDto): Promise<Result<any>> {
         const _result =  await this.articleService.createOrUpdateObject(articleObjectDto);
         return { code: 200, success: true, message: '成功！', result: null };
     }
-
+    @Roles('admin', 'user')
+    @UseGuards(AuthGuard(), RolesGuard)
     @Post('/createOrUpdateList')
     @ApiOperation({ title: '添加或更新多个对象' })
     @ApiResponse({ status: 401, description: 'Forbidden.' })
@@ -51,7 +52,8 @@ export class ArticleController {
         const _result =  await this.articleService.createOrUpdateList(articleListDto);
         return { code: 200, success: true, message: '成功！', result: null };
     }
-
+    @Roles('admin', 'user')
+    @UseGuards(AuthGuard(), RolesGuard)
     @Delete('/deleteObject')
     @ApiOperation({ title: '删除指定对象' })
     @ApiResponse({ status: 401, description: 'Forbidden.' })

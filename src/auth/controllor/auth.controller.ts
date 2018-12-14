@@ -42,11 +42,17 @@ export class UserController {
         const _result =  await this.userService.queryObject(queryConditionInput);
         return { code: 200, success: true, message: '成功！', result: _result };
     }
+    /**
+     *
+     *
+     * @param {UserObjectDto} userObjectDto
+     * @returns {Promise<Result<any>>}
+     * @memberof UserController 授权时注意@Roles('admin')中可为角色数组，用户拥有改角色即可， 如果不需要角色区分的授权，去掉改标记。
+     */
     @Post('/createOrUpdateObject')
     @Roles('admin')
     @UseGuards(AuthGuard(), RolesGuard)
     @ApiOperation({ title: '添加或更新单个对象' })
-    @ApiResponse({ status: 401, description: 'Forbidden.' })
     async createOrUpdateObject(@Body() userObjectDto: UserObjectDto): Promise<Result<any>> {
         const _result =  await this.userService.createOrUpdateObject(userObjectDto);
         return { code: 200, success: true, message: '成功！', result: null };
@@ -56,7 +62,6 @@ export class UserController {
     @Roles('admin')
     @UseGuards(AuthGuard(), RolesGuard)
     @ApiOperation({ title: '删除指定对象' })
-    @ApiResponse({ status: 401, description: 'Forbidden.' })
     async deleteObject(@Body() userDto: UserDto): Promise<Result<any>> {
         const _result =  await this.userService.deleteObject(userDto);
         return { code: 200, success: true, message: '成功！', result: null };

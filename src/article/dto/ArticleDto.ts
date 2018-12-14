@@ -1,5 +1,5 @@
 import {IsNotEmpty } from 'class-validator';
-import {ExtensionDto } from 'common/dto';
+import {ExtensionDto } from '../../common/dto';
 export class  ArticleDto extends ExtensionDto{
         Id: string;
         @IsNotEmpty()
